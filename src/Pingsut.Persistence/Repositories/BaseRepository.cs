@@ -1,4 +1,4 @@
-using Pingsut.Application.Contracts.Persistence;
+using Pingsut.App.Contracts.Persistence;
 using Pingsut.Persistence.DbContexts;
 
 namespace Pingsut.Persistence.Repositories;

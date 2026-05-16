@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Pingsut.Application.Contracts.Persistence;
+using Pingsut.App.Contracts.Persistence;
 using Pingsut.Domain.Entities;
 using Pingsut.Persistence.DbContexts;
 

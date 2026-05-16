@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Pingsut.Application\Pingsut.Application.csproj"/>
+        <ProjectReference Include="..\Pingsut.App\Pingsut.App.csproj"/>
     </ItemGroup>
 
 </Project>

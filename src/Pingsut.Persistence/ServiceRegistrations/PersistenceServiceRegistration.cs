@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Pingsut.Application.Contracts.Persistence;
+using Pingsut.App.Contracts.Persistence;
 using Pingsut.Persistence.DbContexts;
 using Pingsut.Persistence.Repositories;
 

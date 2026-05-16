@@ -17,9 +17,15 @@
     <PackageReference Include="Slugify.Core" Version="5.1.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\Pingsut.Domain\Pingsut.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Contracts\Persistence" />
+  </ItemGroup>
+  
+  
+  
 </Project>

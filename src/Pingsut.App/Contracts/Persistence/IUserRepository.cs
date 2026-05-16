@@ -1,5 +1,5 @@
 using Pingsut.Domain.Entities;
 
-namespace Pingsut.Application.Contracts.Persistence;
+namespace Pingsut.App.Contracts.Persistence;
 
 public interface IUserRepository : IAsyncRepository<User>;

@@ -1,4 +1,4 @@
-namespace Pingsut.Application.Contracts.Persistence;
+namespace Pingsut.App.Contracts.Persistence;
 
 public interface IAsyncRepository<T> where T : class
 {
