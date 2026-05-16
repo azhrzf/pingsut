@@ -1,0 +1,7 @@
+﻿services:
+  pingsut:
+    image: pingsut
+    build:
+      context: .
+      dockerfile: src/Pingsut.Api/Dockerfile
+
