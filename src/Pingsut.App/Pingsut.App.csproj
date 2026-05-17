@@ -24,6 +24,8 @@
 
   <ItemGroup>
     <Folder Include="Contracts\Persistence" />
+    <Folder Include="Features\Game\Base\" />
+    <Folder Include="Features\Game\Mode\" />
   </ItemGroup>
   
   
