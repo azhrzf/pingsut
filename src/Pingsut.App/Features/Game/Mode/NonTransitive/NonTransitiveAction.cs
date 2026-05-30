@@ -3,5 +3,10 @@ namespace Pingsut.App.Features.Game.Mode.NonTransitive;
 public class NonTransitiveAction
 {
     public int Id { get; set; }
-    public required string CommandName { get; init; }
+    public required NonTransitiveActionBaseData Data { get; set; }
+}
+
+public class NonTransitiveActionBaseData
+{
+    public required string Name { get; init; }
 }

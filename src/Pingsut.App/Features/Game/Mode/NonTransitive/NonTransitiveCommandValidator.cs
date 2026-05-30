@@ -24,7 +24,8 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
 
         RuleFor(x => x)
             .Custom(ValidateMatchActionsAndRules)
-            .Custom(ValidateDefeatsActionsRuleIntegrity);
+            .Custom(ValidateDefeatsActionsRuleIntegrity)
+            .Custom(ValidatePlayerActionsInActions);
     }
 
     private void ValidateRules(List<NonTransitiveRule> rules,
@@ -35,19 +36,26 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
 
         foreach (var rule in rules)
         {
-            if (!uniqueRuleIds.Add(rule.Action.Id))
+            if (rule.DefeatsActionIds.Count == 0)
             {
-                context.AddFailure($"Found duplicate rule id for {rule.Action.CommandName}, id: {rule.Action.Id}.");
+                context.AddFailure("DefeatsActions cannot be empty");
 
                 return;
             }
 
-            if (!uniqueRuleNames.Add(rule.Action.CommandName))
+            if (!uniqueRuleIds.Add(rule.ActionId))
             {
-                context.AddFailure($"Found duplicate rule name for {rule.Action.CommandName}, id: {rule.Action.Id}.");
+                context.AddFailure($"Found duplicate rule id for id: {rule.ActionId}.");
 
                 return;
             }
+
+            // if (!uniqueRuleNames.Add(rule.Action.CommandName))
+            // {
+            //     context.AddFailure($"Found duplicate rule name for {rule.Action.CommandName}, id: {rule.Action.Id}.");
+            //
+            //     return;
+            // }
         }
     }
 
@@ -61,14 +69,14 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
         {
             if (!uniqueActionIds.Add(action.Id))
             {
-                context.AddFailure($"Found duplicate action id for {action.CommandName}, id: {action.Id}.");
+                context.AddFailure($"Found duplicate action id for id: {action.Id}.");
 
                 return;
             }
 
-            if (!uniqueActionNames.Add(action.CommandName))
+            if (!uniqueActionNames.Add(action.Data.Name))
             {
-                context.AddFailure($"Found duplicate action name for {action.CommandName}, id: {action.Id}.");
+                context.AddFailure($"Found duplicate action name for {action.Data.Name}, id: {action.Id}.");
 
                 return;
             }
@@ -78,15 +86,54 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
     private void ValidateMatchActionsAndRules(NonTransitiveCommand command,
         ValidationContext<NonTransitiveCommand> context)
     {
-        var seen = new HashSet<(int Id, string Name)>();
+        var actionIds = command.Actions.Select(a => a.Id).ToHashSet();
 
-        command.Rules.ForEach(rule => seen.Add((rule.Action.Id, rule.Action.CommandName)));
-
-        foreach (var action in command.Actions.Where(action => !seen.Contains((action.Id, action.CommandName))))
+        foreach (var rule in command.Rules)
         {
-            context.AddFailure($"Found action not found in rules: {action.CommandName}, id: {action.Id}.");
+            if (!actionIds.Contains(rule.ActionId))
+            {
+                context.AddFailure($"Rule ActionId {rule.ActionId} does not exist in actions.");
 
-            return;
+                return;
+            }
+
+            foreach (var defeatActionId in rule.DefeatsActionIds)
+            {
+                if (!actionIds.Contains(defeatActionId))
+                {
+                    context.AddFailure($"DefeatsActionId {defeatActionId} in rule {rule.ActionId} does not exist in actions.");
+
+                    return;
+                }
+            }
+        }
+
+        var ruleActionIds = command.Rules.Select(rule => rule.ActionId).ToHashSet();
+
+        foreach (var action in command.Actions)
+        {
+            if (!ruleActionIds.Contains(action.Id))
+            {
+                context.AddFailure($"Found action not found in rules, id: {action.Id}.");
+
+                return;
+            }
+        }
+    }
+
+    private void ValidatePlayerActionsInActions(NonTransitiveCommand command,
+        ValidationContext<NonTransitiveCommand> context)
+    {
+        var actionIds = command.Actions.Select(a => a.Id).ToHashSet();
+
+        foreach (var playerAction in command.PlayerActions)
+        {
+            if (!actionIds.Contains(playerAction.ActionId))
+            {
+                context.AddFailure($"Player action ActionId {playerAction.ActionId} does not exist in actions.");
+
+                return;
+            }
         }
     }
 
@@ -99,45 +146,45 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
         {
             var uniqueDefeatsActions = new HashSet<int>();
 
-            if (rule.DefeatsActions.Count != validDefeatsPerRule)
+            if (rule.DefeatsActionIds.Count != validDefeatsPerRule)
             {
-                context.AddFailure($"The number of defeats per rule in {rule.Action.CommandName} is not valid." +
-                                   $"Expected {validDefeatsPerRule}, got {rule.DefeatsActions.Count}.");
+                context.AddFailure($"The number of defeats per rule in {rule.ActionId} is not valid." +
+                                   $"Expected {validDefeatsPerRule}, got {rule.DefeatsActionIds.Count}.");
 
                 return;
             }
 
-            foreach (var defeatAction in rule.DefeatsActions)
+            foreach (var defeatAction in rule.DefeatsActionIds)
             {
-                if (defeatAction.Id == rule.Action.Id)
+                if (defeatAction == rule.ActionId)
                 {
-                    context.AddFailure($"Logical error: {rule.Action.CommandName} cannot defeat itself.");
+                    context.AddFailure($"Logical error: {rule.ActionId} cannot defeat itself.");
 
                     return;
                 }
 
-                if (!uniqueDefeatsActions.Add(defeatAction.Id))
+                if (!uniqueDefeatsActions.Add(defeatAction))
                 {
                     context.AddFailure(
-                        $"Found duplicate defeat action id for {rule.Action.CommandName}, id: {defeatAction.Id}.");
+                        $"Found duplicate defeat action id for {rule.ActionId}, id: {defeatAction}.");
 
                     return;
                 }
 
-                var matchingDefeatRule = command.Rules.FirstOrDefault(r => r.Action.Id == defeatAction.Id);
+                var matchingDefeatRule = command.Rules.FirstOrDefault(r => r.ActionId == defeatAction);
 
                 if (matchingDefeatRule is null)
                 {
                     context.AddFailure(
-                        $"Found defeat action not found in rules: {defeatAction.CommandName}, id: {defeatAction.Id}.");
+                        $"Found defeat action not found in rules id: {defeatAction}.");
 
                     return;
                 }
 
-                if (matchingDefeatRule.WinAgainst(rule.Action.Id))
+                if (matchingDefeatRule.WinAgainst(rule.ActionId))
                 {
                     context.AddFailure(
-                        $"Logical error: {matchingDefeatRule.Action.CommandName} is already defeated against {rule.Action.CommandName}.");
+                        $"Logical error: {matchingDefeatRule.ActionId} is already defeated against {rule.ActionId}.");
 
                     return;
                 }

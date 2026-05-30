@@ -1,22 +1,15 @@
+using JetBrains.Annotations;
+
 namespace Pingsut.App.Features.Game.Mode.NonTransitive;
 
+[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class NonTransitiveRule
 {
-    public required NonTransitiveAction Action { get; init; }
-    public List<NonTransitiveAction> DefeatsActions { get; }
-
-    public NonTransitiveRule(List<NonTransitiveAction> defeatActions)
-    {
-        if (defeatActions.Count == 0)
-        {
-            throw new InvalidOperationException("DefeatsActions cannot be empty");
-        }
-
-        DefeatsActions = defeatActions;
-    }
+    public required int ActionId { get; init; }
+    public required List<int> DefeatsActionIds { get; init; }
 
     public bool WinAgainst(int id)
     {
-        return DefeatsActions.Any(c => c.Id == id);
+        return DefeatsActionIds.Any(c => c == id);
     }
 }

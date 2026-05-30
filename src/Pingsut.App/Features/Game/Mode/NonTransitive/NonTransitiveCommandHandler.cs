@@ -19,18 +19,20 @@ public class NonTransitiveCommandHandler: IRequestHandler<NonTransitiveCommand, 
         var playerAction = command.PlayerActions[0];
         var opponentAction = command.PlayerActions[1];
 
-        var result = playerAction.Action.Id == opponentAction.Action.Id
+        var result = playerAction.ActionId == opponentAction.ActionId
             ? NonTransitiveEnumResult.Draw
-            : command.Rules.Single(rule => rule.Action.Id == playerAction.Action.Id)
-                .WinAgainst(opponentAction.Action.Id)
+            : command.Rules.Single(rule => rule.ActionId == playerAction.ActionId)
+                .WinAgainst(opponentAction.ActionId)
                 ? NonTransitiveEnumResult.Win
                 : NonTransitiveEnumResult.Lose;
 
+        var translatedAction = command.Actions.Single(action => action.Id == playerAction.ActionId); 
+        
         return new NonTransitiveResult
         {
             Player = playerAction.Player,
-            Action = playerAction.Action,
-            Result = result
+            Action = translatedAction,
+            Result = result.ToString()
         };
     }
 }

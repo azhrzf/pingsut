@@ -5,5 +5,5 @@ namespace Pingsut.App.Features.Game.Mode.NonTransitive;
 public class NonTransitivePlayerAction
 {
     public required BasePlayer Player { get; init; }
-    public required NonTransitiveAction Action { get; init; }
+    public required int ActionId { get; init; }
 }
