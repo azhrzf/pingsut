@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="16.1.1" />
     <PackageReference Include="FluentResults" Version="4.0.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
     <PackageReference Include="MediatR" Version="14.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="10.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.16.0" />
@@ -19,11 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pingsut.Domain\Pingsut.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Contracts\Persistence" />
     <Folder Include="Features\Game\Base\" />
     <Folder Include="Features\Game\Mode\" />
   </ItemGroup>
