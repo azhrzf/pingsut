@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Pingsut.App.Features.Game.Mode.NonTransitive;
+namespace Pingsut.App.Features.NonTransitive;
 
 public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveCommand>
 {
@@ -8,9 +8,9 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
     {
         RuleFor(x => x.PlayerActions)
             .Cascade(CascadeMode.Stop)
-            .Must(actions => actions.Count == 2)
+            .Must(actions => actions is { Count: 2 })
             .WithMessage("Exactly 2 player are required");
-
+        
         RuleFor(x => x.Actions)
             .Cascade(CascadeMode.Stop)
             .Must(actions => actions.Count >= 3)
@@ -32,7 +32,6 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
         ValidationContext<NonTransitiveCommand> context)
     {
         var uniqueRuleIds = new HashSet<int>();
-        var uniqueRuleNames = new HashSet<string>();
 
         foreach (var rule in rules)
         {
@@ -49,13 +48,6 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
 
                 return;
             }
-
-            // if (!uniqueRuleNames.Add(rule.Action.CommandName))
-            // {
-            //     context.AddFailure($"Found duplicate rule name for {rule.Action.CommandName}, id: {rule.Action.Id}.");
-            //
-            //     return;
-            // }
         }
     }
 
@@ -126,8 +118,22 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
     {
         var actionIds = command.Actions.Select(a => a.Id).ToHashSet();
 
+        if (command.PlayerActions is null)
+        {
+            context.AddFailure("PlayerActions cannot be null");
+            
+            return;
+        }
+        
         foreach (var playerAction in command.PlayerActions)
         {
+            if (!playerAction.LockAction)
+            {
+                context.AddFailure("PlayerActions must be locked");
+                
+                return;
+            }
+            
             if (!actionIds.Contains(playerAction.ActionId))
             {
                 context.AddFailure($"Player action ActionId {playerAction.ActionId} does not exist in actions.");

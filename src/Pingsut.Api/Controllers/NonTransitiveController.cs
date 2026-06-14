@@ -1,7 +1,7 @@
 using Asp.Versioning;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Pingsut.App.Features.Game.Mode.NonTransitive;
+using Pingsut.App.Contracts;
+using Pingsut.App.Features.NonTransitive;
 
 namespace Pingsut.Api.Controllers;
 
@@ -11,23 +11,23 @@ namespace Pingsut.Api.Controllers;
 [Produces("application/json")]
 public class NonTransitiveController : ControllerBase
 {
-    private readonly ISender _sender;
+    private readonly INonTransitiveService _gameService;
 
-    public NonTransitiveController(ISender sender)
+    public NonTransitiveController(INonTransitiveService gameService)
     {
-        _sender = sender;
+        _gameService = gameService;
     }
 
-    [HttpPost("result")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> GetGameResult(NonTransitiveCommand command,
-        CancellationToken cancellationToken = default)
-    {
-        var result = await _sender.Send(command, cancellationToken);
-
-        return Ok(result);
-    }
+    // [HttpPost("result")]
+    // [ProducesResponseType(StatusCodes.Status200OK)]
+    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    // [ProducesResponseType(StatusCodes.Status404NotFound)]
+    // [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    // public async Task<IActionResult> GetGameResult(NonTransitiveCommand command,
+    //     CancellationToken cancellationToken = default)
+    // {
+    //     var result = await _gameService.PlayGame(command, cancellationToken);
+    //
+    //     return Ok(result);
+    // }
 }

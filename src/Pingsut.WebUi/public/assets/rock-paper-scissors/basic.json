@@ -1,0 +1,42 @@
+{
+  "commands": [
+    {
+      "id": 1,
+      "data": {
+        "name": "rock"
+      }
+    },
+    {
+      "id": 2,
+      "data": {
+        "name": "paper"
+      }
+    },
+    {
+      "id": 3,
+      "data": {
+        "name": "scissors"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "commandId": 1,
+      "defeatsCommandId": [
+        3
+      ]
+    },
+    {
+      "commandId": 2,
+      "defeatsCommandId": [
+        1
+      ]
+    },
+    {
+      "commandId": 3,
+      "defeatsCommandId": [
+        2
+      ]
+    }
+  ]
+}

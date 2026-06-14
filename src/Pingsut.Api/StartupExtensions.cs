@@ -11,7 +11,6 @@ public static class StartupExtensions
     {
         builder.Services.AddApiServices();
         builder.Services.AddApplicationServices();
-        builder.Services.AddApplicationValidatorsServices();
         
         return builder.Build();
     }

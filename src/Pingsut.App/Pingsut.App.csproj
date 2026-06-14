@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -11,16 +11,6 @@
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
-    <PackageReference Include="MediatR" Version="14.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="10.0.0" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.16.0" />
-    <PackageReference Include="Slugify.Core" Version="5.1.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\Game\Base\" />
-    <Folder Include="Features\Game\Mode\" />
   </ItemGroup>
   
   

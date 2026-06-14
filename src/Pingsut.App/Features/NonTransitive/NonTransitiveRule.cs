@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Pingsut.App.Features.Game.Mode.NonTransitive;
+namespace Pingsut.App.Features.NonTransitive;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
 public class NonTransitiveRule

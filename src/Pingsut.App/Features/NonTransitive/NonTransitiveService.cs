@@ -1,23 +1,24 @@
 using FluentValidation;
-using MediatR;
+using Pingsut.App.Contracts;
+using Pingsut.App.Domain;
 
-namespace Pingsut.App.Features.Game.Mode.NonTransitive;
+namespace Pingsut.App.Features.NonTransitive;
 
-public class NonTransitiveCommandHandler: IRequestHandler<NonTransitiveCommand, NonTransitiveResult>
+public class NonTransitiveService : INonTransitiveService
 {
     private readonly IValidator<NonTransitiveCommand> _validator;
-    
-    public NonTransitiveCommandHandler(IValidator<NonTransitiveCommand> validator)
+
+    public NonTransitiveService(IValidator<NonTransitiveCommand> validator)
     {
         _validator = validator;
     }
 
-    public async Task<NonTransitiveResult> Handle(NonTransitiveCommand command, CancellationToken cancellationToken)
+    public async Task<NonTransitiveResult> GetResult(NonTransitiveCommand command, BasePlayer player)
     {
-        await _validator.ValidateAndThrowAsync(command, cancellationToken);
+        await _validator.ValidateAndThrowAsync(command);
 
-        var playerAction = command.PlayerActions[0];
-        var opponentAction = command.PlayerActions[1];
+        var playerAction = command.PlayerActions.Single(p => p.Player.Id == player.Id);
+        var opponentAction = command.PlayerActions.Single(p => p.Player.Id != player.Id);
 
         var result = playerAction.ActionId == opponentAction.ActionId
             ? NonTransitiveEnumResult.Draw
@@ -26,8 +27,8 @@ public class NonTransitiveCommandHandler: IRequestHandler<NonTransitiveCommand, 
                 ? NonTransitiveEnumResult.Win
                 : NonTransitiveEnumResult.Lose;
 
-        var translatedAction = command.Actions.Single(action => action.Id == playerAction.ActionId); 
-        
+        var translatedAction = command.Actions.Single(action => action.Id == playerAction.ActionId);
+
         return new NonTransitiveResult
         {
             Player = playerAction.Player,

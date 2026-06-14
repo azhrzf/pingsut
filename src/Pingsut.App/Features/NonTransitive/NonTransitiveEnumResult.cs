@@ -1,4 +1,4 @@
-namespace Pingsut.App.Features.Game.Mode.NonTransitive;
+namespace Pingsut.App.Features.NonTransitive;
 
 public enum NonTransitiveEnumResult
 {

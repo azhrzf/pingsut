@@ -1,6 +1,6 @@
-using Pingsut.App.Features.Game.Base.Players;
+using Pingsut.App.Domain;
 
-namespace Pingsut.App.Features.Game.Mode.NonTransitive;
+namespace Pingsut.App.Features.NonTransitive;
 
 public class NonTransitiveResult
 {

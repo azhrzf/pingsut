@@ -9,6 +9,7 @@ public static class ApiServiceRegistration
     public static void AddApiServices(this IServiceCollection services)
     {
         services.AddOpenApi();
+        services.AddSignalR();
         services.AddControllers(options =>
         {
             options.Conventions.Add(
