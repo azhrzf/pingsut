@@ -20,20 +20,42 @@ public class NonTransitiveService : INonTransitiveService
         var playerAction = command.PlayerActions.Single(p => p.Player.Id == player.Id);
         var opponentAction = command.PlayerActions.Single(p => p.Player.Id != player.Id);
 
-        var result = playerAction.ActionId == opponentAction.ActionId
-            ? NonTransitiveEnumResult.Draw
-            : command.Rules.Single(rule => rule.ActionId == playerAction.ActionId)
+        var matchPlayerResult = NonTransitiveEnumResult.Draw;
+        var matchOpponentResult = NonTransitiveEnumResult.Draw;
+
+        if (playerAction.ActionId != opponentAction.ActionId)
+        {
+            matchPlayerResult = command.Rules.Single(rule => rule.ActionId == playerAction.ActionId)
                 .WinAgainst(opponentAction.ActionId)
                 ? NonTransitiveEnumResult.Win
                 : NonTransitiveEnumResult.Lose;
 
-        var translatedAction = command.Actions.Single(action => action.Id == playerAction.ActionId);
+            matchOpponentResult = matchPlayerResult == NonTransitiveEnumResult.Win
+                ? NonTransitiveEnumResult.Lose
+                : NonTransitiveEnumResult.Win;
+        }
 
-        return new NonTransitiveResult
+        var translatedAction = command.Actions.Single(action => action.Id == playerAction.ActionId);
+        var translatedOpponentAction = command.Actions.Single(action => action.Id == opponentAction.ActionId);
+
+        NonTransitivePlayerResult playerResult = new()
         {
             Player = playerAction.Player,
             Action = translatedAction,
-            Result = result.ToString()
+            Result = matchPlayerResult
+        };
+
+        NonTransitivePlayerResult opponentResult = new()
+        {
+            Player = opponentAction.Player,
+            Action = translatedOpponentAction,
+            Result = matchOpponentResult
+        };
+
+
+        return new NonTransitiveResult
+        {
+            Players = [playerResult, opponentResult]
         };
     }
 }

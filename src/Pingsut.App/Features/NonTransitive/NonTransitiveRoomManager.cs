@@ -47,7 +47,9 @@ public class NonTransitiveRoomManager
 
         if (!_rooms.TryGetValue(roomId, out var room)) return;
 
-        if (room.Players.Count == 1)
+        room.Players.RemoveAll(p => p.Id == playerConnectionId);
+
+        if (room.Players.Count == 0)
         {
             _rooms.Remove(roomId);
         }
@@ -90,5 +92,17 @@ public class NonTransitiveRoomManager
         }
 
         throw new ValidationException("Player not found.");
+    }
+    
+    public void ClearMoves(string roomId)
+    {
+        if (_rooms.TryGetValue(roomId, out var room))
+        {
+            room.NonTransitiveCommand.PlayerActions.Clear();
+            
+            return;
+        }
+        
+        throw new ValidationException("Room not found.");
     }
 }

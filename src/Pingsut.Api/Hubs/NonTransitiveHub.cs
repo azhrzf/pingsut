@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
+using Pingsut.App.Contracts;
 using Pingsut.App.Domain;
 using Pingsut.App.Features.NonTransitive;
 
@@ -7,15 +8,15 @@ namespace Pingsut.Api.Hubs;
 public class NonTransitiveHub : Hub
 {
     private readonly NonTransitiveRoomManager _roomManager;
-    private readonly NonTransitiveService _service;
+    private readonly INonTransitiveService _service;
 
-    public NonTransitiveHub(NonTransitiveRoomManager roomManager, NonTransitiveService nonTransitiveService)
+    public NonTransitiveHub(NonTransitiveRoomManager roomManager, INonTransitiveService nonTransitiveService)
     {
         _roomManager = roomManager;
         _service = nonTransitiveService;
     }
 
-    public async Task CreateRoom(NonTransitiveCommand command)
+    public async Task<string> CreateRoom(NonTransitiveCommand command)
     {
         var newId = Guid.NewGuid().ToString();
 
@@ -24,6 +25,8 @@ public class NonTransitiveHub : Hub
         await Groups.AddToGroupAsync(Context.ConnectionId, newId);
 
         _roomManager.CreateRoom(newId, player, command);
+
+        return newId;
     }
 
     public async Task JoinRoom(string roomId)
@@ -35,6 +38,15 @@ public class NonTransitiveHub : Hub
             _roomManager.JoinRoom(roomId, player);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
+
+            var room = _roomManager.GetRoomByPlayerId(Context.ConnectionId);
+            
+            await Clients.Group(roomId).SendAsync("RoomUpdated", new
+            {
+                RoomId = room.Id,
+                Players = room.Players,
+                Command = room.NonTransitiveCommand
+            });
         }
         catch (Exception ex)
         {
@@ -47,13 +59,19 @@ public class NonTransitiveHub : Hub
         _roomManager.LeaveRoom(Context.ConnectionId);
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
+
+        await Clients.Group(roomId).SendAsync("PlayerLeft", Context.ConnectionId);
     }
 
-    public void SendMove(int actionId)
+    public async Task SendMove(int actionId)
     {
         try
         {
             _roomManager.SendMove(Context.ConnectionId, actionId);
+            
+            var room = _roomManager.GetRoomByPlayerId(Context.ConnectionId);
+            
+            await Clients.Group(room.Id).SendAsync("PlayerMoved", Context.ConnectionId);
         }
         catch (Exception ex)
         {
@@ -63,21 +81,39 @@ public class NonTransitiveHub : Hub
 
     public async Task LockResult(BasePlayer player)
     {
-        int lockedCount = _roomManager.LockResult(Context.ConnectionId);
+        var lockedCount = _roomManager.LockResult(Context.ConnectionId);
+        var room = _roomManager.GetRoomByPlayerId(Context.ConnectionId);
+
+        await Clients.Group(room.Id).SendAsync("PlayerLocked", Context.ConnectionId);
 
         if (lockedCount == 2)
         {
-            var command = _roomManager.GetRoomByPlayerId(Context.ConnectionId).NonTransitiveCommand;
+            var command = room.NonTransitiveCommand;
 
-            // return _service.GetResult(command, player);
+            var result = await _service.GetResult(command, player);
+            
+            await Clients.Group(room.Id).SendAsync("ReceiveResult", result);
+            
+            _roomManager.ClearMoves(room.Id);
         }
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        _roomManager.LeaveRoom(Context.ConnectionId);
-
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, Context.ConnectionId);
+        try
+        {
+            var room = _roomManager.GetRoomByPlayerId(Context.ConnectionId);
+            if (room != null)
+            {
+                _roomManager.LeaveRoom(Context.ConnectionId);
+                await Clients.Group(room.Id).SendAsync("PlayerLeft", Context.ConnectionId);
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, room.Id);
+            }
+        }
+        catch
+        {
+            // Ignore if player/room not found during disconnect cleanup
+        }
 
         await base.OnDisconnectedAsync(exception);
     }

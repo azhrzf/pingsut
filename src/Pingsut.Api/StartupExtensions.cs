@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Pingsut.Api.Handlers;
+using Pingsut.Api.Hubs;
 using Pingsut.Api.ServiceRegistrations;
 using Pingsut.App.ServiceRegistrations;
 
@@ -36,6 +37,7 @@ public static class StartupExtensions
             app.UseCors();
         }
 
+        app.MapHub<NonTransitiveHub>("/nonTransitiveHub");
         app.UseExceptionHandler();
         app.UseHttpsRedirection();
         app.MapControllers();
