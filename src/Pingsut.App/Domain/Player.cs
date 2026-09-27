@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace Pingsut.App.Domain;
 
-public class BasePlayer
+public class BasePlayer : IdentityUser;
+
+public class PlayerWithConnectionId : BasePlayer
 {
-    public required string Id { get; init; }
+    public required string ConnectionId { get; init; }
 }
