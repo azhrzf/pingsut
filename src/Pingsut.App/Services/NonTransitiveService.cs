@@ -1,8 +1,13 @@
 using FluentValidation;
-using Pingsut.App.Contracts;
 using Pingsut.App.Domain;
+using Pingsut.App.Features.NonTransitive;
 
-namespace Pingsut.App.Features.NonTransitive;
+namespace Pingsut.App.Services;
+
+public interface INonTransitiveService
+{
+    Task<NonTransitiveResult> GetResult(NonTransitiveCommand command, BasePlayer player);
+}
 
 public class NonTransitiveService : INonTransitiveService
 {
