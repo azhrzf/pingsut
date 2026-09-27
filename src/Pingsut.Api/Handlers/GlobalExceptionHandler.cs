@@ -1,11 +1,9 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Pingsut.Api.Handlers;
 
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 
 public sealed class GlobalExceptionHandler(
+    IProblemDetailsService problemDetailsService,
     ILogger<GlobalExceptionHandler> logger)
     : IExceptionHandler
 {
@@ -14,33 +12,16 @@ public sealed class GlobalExceptionHandler(
         Exception exception,
         CancellationToken cancellationToken)
     {
+        var problemDetails = ProblemDetailsMapper.Map(exception);
+        httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
+
         logger.LogError(exception, "Unhandled exception occurred");
 
-        var problemDetails = exception switch
+        return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
-            ValidationException ex => new ProblemDetails
-            {
-                Status = StatusCodes.Status400BadRequest,
-                Title = "Bad Request",
-                Detail = ex.Message,
-                Type = "https://httpstatuses.com/400"
-            },
-
-            _ => new ProblemDetails
-            {
-                Status = StatusCodes.Status500InternalServerError,
-                Title = "Internal Server Error",
-                Detail = "An unexpected error occurred.",
-                Type = "https://httpstatuses.com/500"
-            }
-        };
-
-        if (problemDetails.Status != null) httpContext.Response.StatusCode = problemDetails.Status.Value;
-
-        await httpContext.Response.WriteAsJsonAsync(
-            problemDetails,
-            cancellationToken);
-
-        return true;
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails = problemDetails
+        });
     }
 }
