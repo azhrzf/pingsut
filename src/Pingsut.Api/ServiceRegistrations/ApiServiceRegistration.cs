@@ -41,5 +41,7 @@ public static class ApiServiceRegistration
                 options.GroupNameFormat = "'v'VVV";
                 options.SubstituteApiVersionInUrl = true;
             });
+        services.AddAuthentication();
+        services.AddAuthorization();
     }
 }
