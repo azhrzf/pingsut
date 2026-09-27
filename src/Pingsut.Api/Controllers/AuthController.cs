@@ -29,4 +29,15 @@ public class AuthController : ControllerBase
 
         return Created();
     }
+
+    [HttpPost("login")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
+    {
+        await _authService.LoginAsync(loginRequestDto);
+
+        return Ok();
+    }
 }
