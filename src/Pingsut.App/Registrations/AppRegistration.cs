@@ -6,9 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Pingsut.App.Features.NonTransitive;
 using Pingsut.App.Services;
 
-namespace Pingsut.App.ServiceRegistrations;
+namespace Pingsut.App.Registrations;
 
-public static class ApplicationServiceRegistration
+public static class AppRegistration
 {
     public static void AddApplicationServices(this IServiceCollection services)
     {

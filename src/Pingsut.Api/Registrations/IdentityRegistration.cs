@@ -2,9 +2,9 @@
 using Pingsut.App.Domain;
 using Pingsut.Database;
 
-namespace Pingsut.Api.ServiceRegistrations;
+namespace Pingsut.Api.Registrations;
 
-public static class IdentityServiceRegistration
+public static class IdentityRegistration
 {
     public static void AddIdentityServices(this IServiceCollection services, WebApplicationBuilder builder)
     {
