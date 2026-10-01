@@ -1,8 +1,7 @@
 ﻿using Pingsut.App.Domain;
-using Pingsut.App.DTO;
 using Pingsut.App.Features.NonTransitive;
 
-namespace Pingsut.App.HubContexts;
+namespace Pingsut.App.HubContextContracts;
 
 public interface INonTransitiveHubContext
 {

@@ -2,7 +2,7 @@
 using Pingsut.Api.Hubs;
 using Pingsut.App.Domain;
 using Pingsut.App.Features.NonTransitive;
-using Pingsut.App.HubContexts;
+using Pingsut.App.HubContextContracts;
 
 namespace Pingsut.Api.HubContexts;
 

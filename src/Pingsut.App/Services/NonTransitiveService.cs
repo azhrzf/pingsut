@@ -3,7 +3,7 @@ using MapsterMapper;
 using Pingsut.App.Domain;
 using Pingsut.App.DTO;
 using Pingsut.App.Features.NonTransitive;
-using Pingsut.App.HubContexts;
+using Pingsut.App.HubContextContracts;
 
 namespace Pingsut.App.Services;
 
