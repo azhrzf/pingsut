@@ -2,15 +2,17 @@ using Pingsut.App.Domain;
 
 namespace Pingsut.App.Features.NonTransitive;
 
-public class NonTransitiveResult
-{
-    public required NonTransitivePlayerResult[] Players { get; init; }
-}
+public sealed record NonTransitiveResult(
+    NonTransitivePlayerResult[] PlayerResults);
 
-public class NonTransitivePlayerResult
+public sealed record NonTransitivePlayerResult(
+    Player Player,
+    NonTransitiveMatchResult Result,
+    NonTransitiveAction Action);
+
+public enum NonTransitiveMatchResult
 {
-    public required BasePlayer Player { get; set; }
-    public required NonTransitiveEnumResult Result { get; set; }
-    public required NonTransitiveAction Action { get; set; }
-    
+    Win,
+    Lose,
+    Draw
 }

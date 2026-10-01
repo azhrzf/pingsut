@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Pingsut.App.Features.NonTransitive;
 
-public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveCommand>
+public sealed class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveCommand>
 {
     public NonTransitiveCommandValidator()
     {
@@ -10,7 +10,7 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
             .Cascade(CascadeMode.Stop)
             .Must(actions => actions is { Count: 2 })
             .WithMessage("Exactly 2 player are required");
-        
+
         RuleFor(x => x.Actions)
             .Cascade(CascadeMode.Stop)
             .Must(actions => actions.Count >= 3)
@@ -38,14 +38,12 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
             if (rule.DefeatsActionIds.Count == 0)
             {
                 context.AddFailure("DefeatsActions cannot be empty");
-
                 return;
             }
 
             if (!uniqueRuleIds.Add(rule.ActionId))
             {
                 context.AddFailure($"Found duplicate rule id for id: {rule.ActionId}.");
-
                 return;
             }
         }
@@ -62,14 +60,12 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
             if (!uniqueActionIds.Add(action.Id))
             {
                 context.AddFailure($"Found duplicate action id for id: {action.Id}.");
-
                 return;
             }
 
             if (!uniqueActionNames.Add(action.Data.Name))
             {
                 context.AddFailure($"Found duplicate action name for {action.Data.Name}, id: {action.Id}.");
-
                 return;
             }
         }
@@ -85,7 +81,6 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
             if (!actionIds.Contains(rule.ActionId))
             {
                 context.AddFailure($"Rule ActionId {rule.ActionId} does not exist in actions.");
-
                 return;
             }
 
@@ -93,8 +88,8 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
             {
                 if (!actionIds.Contains(defeatActionId))
                 {
-                    context.AddFailure($"DefeatsActionId {defeatActionId} in rule {rule.ActionId} does not exist in actions.");
-
+                    context.AddFailure(
+                        $"DefeatsActionId {defeatActionId} in rule {rule.ActionId} does not exist in actions.");
                     return;
                 }
             }
@@ -107,7 +102,6 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
             if (!ruleActionIds.Contains(action.Id))
             {
                 context.AddFailure($"Found action not found in rules, id: {action.Id}.");
-
                 return;
             }
         }
@@ -118,26 +112,17 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
     {
         var actionIds = command.Actions.Select(a => a.Id).ToHashSet();
 
-        if (command.PlayerActions is null)
-        {
-            context.AddFailure("PlayerActions cannot be null");
-            
-            return;
-        }
-        
         foreach (var playerAction in command.PlayerActions)
         {
             if (!playerAction.LockAction)
             {
                 context.AddFailure("PlayerActions must be locked");
-                
                 return;
             }
-            
+
             if (!actionIds.Contains(playerAction.ActionId))
             {
                 context.AddFailure($"Player action ActionId {playerAction.ActionId} does not exist in actions.");
-
                 return;
             }
         }
@@ -165,7 +150,6 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
                 if (defeatAction == rule.ActionId)
                 {
                     context.AddFailure($"Logical error: {rule.ActionId} cannot defeat itself.");
-
                     return;
                 }
 
@@ -173,7 +157,6 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
                 {
                     context.AddFailure(
                         $"Found duplicate defeat action id for {rule.ActionId}, id: {defeatAction}.");
-
                     return;
                 }
 
@@ -181,9 +164,7 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
 
                 if (matchingDefeatRule is null)
                 {
-                    context.AddFailure(
-                        $"Found defeat action not found in rules id: {defeatAction}.");
-
+                    context.AddFailure($"Found defeat action not found in rules id: {defeatAction}.");
                     return;
                 }
 
@@ -191,7 +172,6 @@ public class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveComm
                 {
                     context.AddFailure(
                         $"Logical error: {matchingDefeatRule.ActionId} is already defeated against {rule.ActionId}.");
-
                     return;
                 }
             }

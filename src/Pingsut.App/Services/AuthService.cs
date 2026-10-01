@@ -13,11 +13,11 @@ public interface IAuthService
 
 public class AuthService : IAuthService
 {
-    private readonly UserManager<BasePlayer> _userManager;
-    private readonly SignInManager<BasePlayer> _signInManager;
+    private readonly UserManager<Player> _userManager;
+    private readonly SignInManager<Player> _signInManager;
     private readonly IMapper _mapper;
 
-    public AuthService(UserManager<BasePlayer> userManager, SignInManager<BasePlayer> signInManager, IMapper mapper)
+    public AuthService(UserManager<Player> userManager, SignInManager<Player> signInManager, IMapper mapper)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -26,17 +26,14 @@ public class AuthService : IAuthService
 
     public async Task CreateAsync(RegisterRequestDto registerRequestDto)
     {
-        var basePlayer = _mapper.Map<BasePlayer>(registerRequestDto);
-
+        var basePlayer = _mapper.Map<Player>(registerRequestDto);
         await _userManager.CreateAsync(basePlayer, registerRequestDto.Password);
     }
 
     public async Task LoginAsync(LoginRequestDto loginRequestDto)
     {
-        var user = await _userManager.FindByEmailAsync(loginRequestDto.Email);
-
+        var user = await _userManager.FindByNameAsync(loginRequestDto.UserName);
         if (user is null) throw new UnauthorizedAccessException("Invalid username or password");
-
         await _signInManager.PasswordSignInAsync(user, loginRequestDto.Password, true, true);
     }
 }

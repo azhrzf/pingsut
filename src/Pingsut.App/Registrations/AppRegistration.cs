@@ -14,7 +14,7 @@ public static class AppRegistration
     {
         services.AddScoped<INonTransitiveService, NonTransitiveService>();
         services.AddScoped<IAuthService, AuthService>();
-        services.AddSingleton<NonTransitiveRoomManager>();
+        services.AddSingleton<INonTransitiveRoomStore, NonTransitiveRoomStore>();
 
         services.AddValidatorsFromAssemblyContaining<NonTransitiveCommandValidator>();
 

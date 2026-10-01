@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Pingsut.App.Domain;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Pingsut.Database;
 
 namespace Pingsut.Api.Registrations;
@@ -11,7 +11,7 @@ public static class IdentityRegistration
         var postgresConnectionString = builder.Configuration.GetConnectionString("PostgresConnection");
 
         services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(postgresConnectionString));
-        services.AddIdentityApiEndpoints<BasePlayer>()
+        services.AddIdentityApiEndpoints<IdentityUser>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
     }
 }

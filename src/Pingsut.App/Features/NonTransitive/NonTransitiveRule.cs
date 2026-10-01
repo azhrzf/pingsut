@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 namespace Pingsut.App.Features.NonTransitive;
 
 [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-public class NonTransitiveRule
+public sealed class NonTransitiveRule
 {
     public required int ActionId { get; init; }
     public required List<int> DefeatsActionIds { get; init; }
