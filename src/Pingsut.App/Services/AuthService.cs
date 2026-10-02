@@ -1,6 +1,5 @@
 ﻿using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
-using Pingsut.App.Domain;
 using Pingsut.App.DTO;
 
 namespace Pingsut.App.Services;
@@ -13,11 +12,11 @@ public interface IAuthService
 
 public class AuthService : IAuthService
 {
-    private readonly UserManager<Player> _userManager;
-    private readonly SignInManager<Player> _signInManager;
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
     private readonly IMapper _mapper;
 
-    public AuthService(UserManager<Player> userManager, SignInManager<Player> signInManager, IMapper mapper)
+    public AuthService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IMapper mapper)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -26,8 +25,8 @@ public class AuthService : IAuthService
 
     public async Task CreateAsync(RegisterRequestDto registerRequestDto)
     {
-        var basePlayer = _mapper.Map<Player>(registerRequestDto);
-        await _userManager.CreateAsync(basePlayer, registerRequestDto.Password);
+        var user = _mapper.Map<IdentityUser>(registerRequestDto);
+        await _userManager.CreateAsync(user, registerRequestDto.Password);
     }
 
     public async Task LoginAsync(LoginRequestDto loginRequestDto)
