@@ -1,7 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Pingsut.Api.Handlers;
+using Pingsut.Api.HubContexts;
 using Pingsut.Api.Utils;
+using Pingsut.App.HubContextContracts;
 
 namespace Pingsut.Api.Registrations;
 
@@ -9,6 +11,8 @@ public static class ApiRegistration
 {
     public static void AddApiServices(this IServiceCollection services)
     {
+        services.AddScoped<INonTransitiveHubContext, NonTransitiveHubContext>();
+
         services.AddOpenApi();
         services.AddSignalR();
         services.AddControllers(options =>
