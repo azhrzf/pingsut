@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Pingsut.App.Features.NonTransitive;
 
@@ -15,9 +16,16 @@ internal static class ProblemDetailsMapper
         Detail = exception.Message
     } );
 
-    Map<UnauthorizedAccessException>( exception => new ProblemDetails
+    Map<AuthenticationException>( exception => new ProblemDetails
     {
         Status = StatusCodes.Status401Unauthorized,
+        Title = "Unauthenticated",
+        Detail = exception.Message
+    } );
+
+    Map<UnauthorizedAccessException>( exception => new ProblemDetails
+    {
+        Status = StatusCodes.Status403Forbidden,
         Title = "Unauthorized",
         Detail = exception.Message
     } );
@@ -56,7 +64,7 @@ internal static class ProblemDetailsMapper
 
   private static void Map<TException>( Func<TException, ProblemDetails> mapping ) where TException : Exception
   {
-    ExceptionMapper mapper = new( typeof( TException ), exception => mapping( ( TException )exception ) );
+    ExceptionMapper mapper = new(typeof( TException ), exception => mapping( ( TException )exception ));
     Mappers.Add( mapper );
   }
 
