@@ -54,4 +54,21 @@ public class NonTransitiveController : ControllerBase
         await _nonTransitiveService.JoinRoom( roomId, userName, cancellationToken );
     return Ok( response );
   }
+
+  [HttpPost( "room/{roomId}/leave" )]
+  [AllowAnonymous]
+  [Consumes( "application/json" )]
+  [Produces( "application/json" )]
+  [ProducesResponseType( StatusCodes.Status200OK )]
+  [ProducesResponseType( StatusCodes.Status400BadRequest )]
+  [ProducesResponseType( StatusCodes.Status404NotFound )]
+  [ProducesResponseType( StatusCodes.Status422UnprocessableEntity )]
+  public async Task<IActionResult> LeaveRoom(
+      string roomId,
+      CancellationToken cancellationToken = default )
+  {
+    string? userName = User.FindFirstValue( ClaimTypes.Name );
+    await _nonTransitiveService.LeaveRoom( roomId, userName, cancellationToken );
+    return Ok();
+  }
 }

@@ -12,11 +12,6 @@ public sealed record NonTransitiveCreateRoomRequestDto(
     List<NonTransitiveRule> Rules );
 
 [PublicAPI]
-public sealed record NonTransitiveLeaveRoomRequestDto(
-    string PlayerUserName,
-    string RoomId );
-
-[PublicAPI]
 public sealed record NonTransitiveSendMoveRequestDto(
     string PlayerUserName,
     string RoomId,

@@ -17,7 +17,7 @@ public interface INonTransitiveService
   Task<NonTransitiveJoinRoomResponseDto> JoinRoom( string roomId, string? playerUserName,
       CancellationToken ct = default );
 
-  Task LeaveRoom( NonTransitiveLeaveRoomRequestDto request, CancellationToken ct = default );
+  Task LeaveRoom( string roomId, string? playerUserName, CancellationToken ct = default );
   Task SendMove( NonTransitiveSendMoveRequestDto request, CancellationToken ct = default );
   Task LockResult( NonTransitiveLockResultRequestDto request, CancellationToken ct = default );
 }
@@ -44,8 +44,7 @@ public class NonTransitiveService : INonTransitiveService
     if( playerUserName is null ) throw new AuthenticationException( "Invalid player username" );
     NonTransitiveCreateRoomValidator.Validate( request );
 
-    Player player = new( playerUserName );
-
+    Player player = new() { UserName = playerUserName };
     string roomId = Guid.NewGuid().ToString();
 
     await _hubContext.HubCreateRoom( playerUserName, roomId, ct );
@@ -58,8 +57,9 @@ public class NonTransitiveService : INonTransitiveService
   public async Task<NonTransitiveJoinRoomResponseDto> JoinRoom( string roomId, string? playerUserName,
       CancellationToken ct = default )
   {
+    bool isAnonymous = playerUserName is null;
     playerUserName ??= Guid.NewGuid().ToString();
-    Player player = new( playerUserName );
+    Player player = new() { UserName = playerUserName, IsAnonymous = isAnonymous };
 
     NonTransitiveRoom room = _roomStore.GetRoomByRoomId( roomId );
 
@@ -71,10 +71,18 @@ public class NonTransitiveService : INonTransitiveService
     return _mapper.Map<NonTransitiveJoinRoomResponseDto>( updatedRoom );
   }
 
-  public async Task LeaveRoom( NonTransitiveLeaveRoomRequestDto request, CancellationToken ct = default )
+  public async Task LeaveRoom( string roomId, string? playerUserName, CancellationToken ct = default )
   {
-    _roomStore.LeaveRoom( request.PlayerUserName );
-    await _hubContext.HubLeaveRoom( request.PlayerUserName, request.RoomId, ct );
+    if( playerUserName is null )
+    {
+      NonTransitiveRoom existingRoom = _roomStore.GetRoomByRoomId( roomId );
+      playerUserName = existingRoom.Players.Find( player => player.IsAnonymous )?.UserName;
+
+      if( playerUserName is null ) throw new InvalidOperationException( "Invalid room id or username" );
+    }
+
+    _roomStore.LeaveRoom( playerUserName );
+    await _hubContext.HubLeaveRoom( playerUserName, roomId, ct );
   }
 
   public async Task SendMove( NonTransitiveSendMoveRequestDto request, CancellationToken ct = default )
