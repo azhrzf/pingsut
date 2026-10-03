@@ -1,69 +1,77 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Pingsut.App.Features.NonTransitive;
 
 namespace Pingsut.Api.Handlers;
 
 internal static class ProblemDetailsMapper
 {
-    static ProblemDetailsMapper()
+  static ProblemDetailsMapper()
+  {
+    Map<ValidationException>( exception => new ProblemDetails
     {
-        Map<ValidationException>(exception => new ProblemDetails
-        {
-            Status = StatusCodes.Status400BadRequest,
-            Title = "Bad Request",
-            Detail = exception.Message
-        });
+        Status = StatusCodes.Status400BadRequest,
+        Title = "Bad Request",
+        Detail = exception.Message
+    } );
 
-        Map<UnauthorizedAccessException>(exception => new ProblemDetails
-        {
-            Status = StatusCodes.Status401Unauthorized,
-            Title = "Unauthorized",
-            Detail = exception.Message
-        });
+    Map<UnauthorizedAccessException>( exception => new ProblemDetails
+    {
+        Status = StatusCodes.Status401Unauthorized,
+        Title = "Unauthorized",
+        Detail = exception.Message
+    } );
 
-        Map<KeyNotFoundException>(exception => new ProblemDetails
-        {
-            Status = StatusCodes.Status404NotFound,
-            Title = "Not Found",
-            Detail = exception.Message
-        });
+    Map<KeyNotFoundException>( exception => new ProblemDetails
+    {
+        Status = StatusCodes.Status404NotFound,
+        Title = "Not Found",
+        Detail = exception.Message
+    } );
+
+    Map<NonTransitiveException>( exception => new ProblemDetails
+    {
+        Status = StatusCodes.Status400BadRequest,
+        Title = "Validation Error",
+        Detail = exception.Message
+    } );
+  }
+
+  public static ProblemDetails Map( Exception exception )
+  {
+    foreach( ExceptionMapper mapper in Mappers )
+    {
+      if( mapper.TryMap( exception, out ProblemDetails? details ) ) return details!;
     }
 
-    public static ProblemDetails Map(Exception exception)
+    return new ProblemDetails
     {
-        foreach (var mapper in Mappers)
-        {
-            if (mapper.TryMap(exception, out var details)) return details!;
-        }
+        Status = StatusCodes.Status500InternalServerError,
+        Title = "Internal Server Error",
+        Detail = "An unexpected error occurred."
+    };
+  }
 
-        return new ProblemDetails
-        {
-            Status = StatusCodes.Status500InternalServerError,
-            Title = "Internal Server Error",
-            Detail = "An unexpected error occurred."
-        };
-    }
+  private static readonly List<ExceptionMapper> Mappers = [];
 
-    private static readonly List<ExceptionMapper> Mappers = [];
+  private static void Map<TException>( Func<TException, ProblemDetails> mapping ) where TException : Exception
+  {
+    ExceptionMapper mapper = new( typeof( TException ), exception => mapping( ( TException )exception ) );
+    Mappers.Add( mapper );
+  }
 
-    private static void Map<TException>(Func<TException, ProblemDetails> mapping) where TException : Exception
+  private sealed class ExceptionMapper( Type type, Func<Exception, ProblemDetails> mapping )
+  {
+    public bool TryMap( Exception exception, out ProblemDetails? problem )
     {
-        var mapper = new ExceptionMapper(typeof(TException), exception => mapping((TException)exception));
-        Mappers.Add(mapper);
-    }
+      if( type.IsInstanceOfType( exception ) )
+      {
+        problem = mapping.Invoke( exception );
+        return true;
+      }
 
-    private sealed class ExceptionMapper(Type type, Func<Exception, ProblemDetails> mapping)
-    {
-        public bool TryMap(Exception exception, out ProblemDetails? problem)
-        {
-            if (type.IsInstanceOfType(exception))
-            {
-                problem = mapping.Invoke(exception);
-                return true;
-            }
-
-            problem = null;
-            return false;
-        }
+      problem = null;
+      return false;
     }
+  }
 }

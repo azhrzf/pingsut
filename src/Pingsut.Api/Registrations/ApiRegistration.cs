@@ -2,7 +2,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Pingsut.Api.Handlers;
 using Pingsut.Api.HubContexts;
-using Pingsut.Api.Utils;
 using Pingsut.App.HubContextContracts;
 
 namespace Pingsut.Api.Registrations;
@@ -15,11 +14,7 @@ public static class ApiRegistration
 
         services.AddOpenApi();
         services.AddSignalR();
-        services.AddControllers(options =>
-        {
-            options.Conventions.Add(
-                new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
-        }).AddNewtonsoftJson();
+        services.AddControllers();
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails(options =>
