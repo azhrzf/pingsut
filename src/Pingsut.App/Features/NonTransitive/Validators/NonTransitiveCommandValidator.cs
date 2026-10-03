@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Pingsut.App.Features.NonTransitive;
+namespace Pingsut.App.Features.NonTransitive.Validators;
 
 public sealed class NonTransitiveCommandValidator : AbstractValidator<NonTransitiveCommand>
 {
@@ -8,70 +8,27 @@ public sealed class NonTransitiveCommandValidator : AbstractValidator<NonTransit
     {
         RuleFor(x => x.PlayerActions)
             .Cascade(CascadeMode.Stop)
-            .Must(actions => actions is { Count: 2 })
-            .WithMessage("Exactly 2 player are required");
+            .MustComplyWithPlayerActionValidator();
 
         RuleFor(x => x.Actions)
             .Cascade(CascadeMode.Stop)
-            .Must(actions => actions.Count >= 3)
-            .WithMessage("At least 3 actions are required")
-            .Must(actions => actions.Count % 2 == 1)
-            .WithMessage("The number of actions is not balanced. It must be odd.")
-            .Custom(ValidateDuplicateActions);
+            .Custom(NonTransitiveActionValidatorCustomRule.ValidateDuplicateActions)
+            .MustComplyWithActionValidator();
 
         RuleFor(x => x.Rules)
-            .Custom(ValidateRules);
+            .Custom(NonTransitiveRuleValidatorCustomRule.ValidateRules);
 
         RuleFor(x => x)
-            .Custom(ValidateMatchActionsAndRules)
-            .Custom(ValidateDefeatsActionsRuleIntegrity)
-            .Custom(ValidatePlayerActionsInActions);
+            .Custom(NonTransitiveCommandValidationExtensions.ValidateMatchActionsAndRules)
+            .Custom(NonTransitiveCommandValidationExtensions.ValidateDefeatsActionsRuleIntegrity)
+            .Custom(NonTransitiveCommandValidationExtensions.ValidatePlayerActionsInActions);
     }
+}
 
-    private void ValidateRules(List<NonTransitiveRule> rules,
-        ValidationContext<NonTransitiveCommand> context)
-    {
-        var uniqueRuleIds = new HashSet<int>();
-
-        foreach (var rule in rules)
-        {
-            if (rule.DefeatsActionIds.Count == 0)
-            {
-                context.AddFailure("DefeatsActions cannot be empty");
-                return;
-            }
-
-            if (!uniqueRuleIds.Add(rule.ActionId))
-            {
-                context.AddFailure($"Found duplicate rule id for id: {rule.ActionId}.");
-                return;
-            }
-        }
-    }
-
-    private void ValidateDuplicateActions(List<NonTransitiveAction> actions,
-        ValidationContext<NonTransitiveCommand> context)
-    {
-        var uniqueActionIds = new HashSet<int>();
-        var uniqueActionNames = new HashSet<string>();
-
-        foreach (var action in actions)
-        {
-            if (!uniqueActionIds.Add(action.Id))
-            {
-                context.AddFailure($"Found duplicate action id for id: {action.Id}.");
-                return;
-            }
-
-            if (!uniqueActionNames.Add(action.Data.Name))
-            {
-                context.AddFailure($"Found duplicate action name for {action.Data.Name}, id: {action.Id}.");
-                return;
-            }
-        }
-    }
-
-    private void ValidateMatchActionsAndRules(NonTransitiveCommand command,
+internal static class NonTransitiveCommandValidationExtensions
+{
+    internal static void ValidateMatchActionsAndRules(
+        NonTransitiveCommand command,
         ValidationContext<NonTransitiveCommand> context)
     {
         var actionIds = command.Actions.Select(a => a.Id).ToHashSet();
@@ -107,7 +64,8 @@ public sealed class NonTransitiveCommandValidator : AbstractValidator<NonTransit
         }
     }
 
-    private void ValidatePlayerActionsInActions(NonTransitiveCommand command,
+    internal static void ValidatePlayerActionsInActions(
+        NonTransitiveCommand command,
         ValidationContext<NonTransitiveCommand> context)
     {
         var actionIds = command.Actions.Select(a => a.Id).ToHashSet();
@@ -128,7 +86,8 @@ public sealed class NonTransitiveCommandValidator : AbstractValidator<NonTransit
         }
     }
 
-    private void ValidateDefeatsActionsRuleIntegrity(NonTransitiveCommand command,
+    internal static void ValidateDefeatsActionsRuleIntegrity(
+        NonTransitiveCommand command,
         ValidationContext<NonTransitiveCommand> context)
     {
         var validDefeatsPerRule = (command.Actions.Count - 1) / 2;
