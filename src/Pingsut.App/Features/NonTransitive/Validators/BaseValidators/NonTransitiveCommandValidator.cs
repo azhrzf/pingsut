@@ -14,7 +14,8 @@ public static class NonTransitiveCommandValidator
         .. NonTransitiveRuleValidator.ValidateRulesIntegrity( command.Rules, command.Actions ),
         .. ValidateMatchActionsAndRules( command ),
         .. ValidateDefeatsActionsRuleIntegrity( command ),
-        .. ValidatePlayerActionsInActions( command )
+        .. ValidatePlayerActionsInActions( command ),
+        .. NonTransitiveResultValidator.ValidateMaxOnlyOneAnonymousPlayer( command.PlayerActions ) // Should empty
     ];
 
     Dictionary<string, string[]> result = [];

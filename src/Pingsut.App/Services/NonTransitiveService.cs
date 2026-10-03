@@ -93,6 +93,8 @@ public class NonTransitiveService : INonTransitiveService
     if( lockedCount == 2 )
     {
       NonTransitiveCommand command = room.NonTransitiveCommand;
+      PenetratedRoomValidator( command, room.Id, ct );
+
       NonTransitiveResult result = GetResult( command, request.Player );
       await _hubContext.HubReceiveResult( room.Id, result, ct );
       _roomStore.ClearMoves( room.Id );
@@ -129,5 +131,23 @@ public class NonTransitiveService : INonTransitiveService
         new( opponentAction.Player, matchOpponentResult, translatedOpponentAction );
 
     return new NonTransitiveResult( [playerResult, opponentResult] );
+  }
+
+  private void PenetratedRoomValidator( NonTransitiveCommand command, string roomId,
+      CancellationToken ct = default )
+  {
+    try
+    {
+      NonTransitiveResultValidator.Validate( command );
+    }
+    catch( NonTransitiveException )
+    {
+      command.PlayerActions.ForEach( async void ( playerAction ) =>
+      {
+        await _hubContext.HubRemovePlayersFromRoom( playerAction.Player.UserName, roomId, ct );
+      } );
+
+      throw;
+    }
   }
 }

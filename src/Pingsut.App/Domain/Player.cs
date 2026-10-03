@@ -1,4 +1,7 @@
 namespace Pingsut.App.Domain;
 
-public sealed record Player(
-    string UserName );
+public sealed class Player
+{
+  public required string UserName { get; init; }
+  public bool IsAnonymous { get; init; }
+}

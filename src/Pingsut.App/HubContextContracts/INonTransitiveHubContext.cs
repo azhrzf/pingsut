@@ -11,4 +11,5 @@ public interface INonTransitiveHubContext
   Task HubSendMove( string playerUserName, string roomId, CancellationToken ct = default );
   Task HubLockResult( string playerUserName, string roomId, CancellationToken ct = default );
   Task HubReceiveResult( string roomId, NonTransitiveResult result, CancellationToken ct = default );
+  Task HubRemovePlayersFromRoom( string playerUserName, string roomId, CancellationToken ct = default );
 }

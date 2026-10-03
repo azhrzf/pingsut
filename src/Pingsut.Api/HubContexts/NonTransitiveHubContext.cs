@@ -51,4 +51,10 @@ public class NonTransitiveHubContext : INonTransitiveHubContext
   {
     await _hub.Clients.Group( roomId ).SendAsync( "ReceiveResult", result, cancellationToken: ct );
   }
+
+  public async Task HubRemovePlayersFromRoom( string playerUserName, string roomId,
+      CancellationToken ct = default )
+  {
+    await _hub.Groups.RemoveFromGroupAsync( playerUserName, roomId, ct );
+  }
 }
