@@ -1,4 +1,4 @@
-﻿using Pingsut.App.Domain;
+using Pingsut.App.Domain;
 using Pingsut.App.Features.NonTransitive;
 
 namespace Pingsut.App.HubContextContracts;

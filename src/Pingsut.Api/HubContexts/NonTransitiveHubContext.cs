@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using Pingsut.Api.Hubs;
 using Pingsut.App.Domain;
 using Pingsut.App.Features.NonTransitive;
@@ -25,9 +25,9 @@ public class NonTransitiveHubContext : INonTransitiveHubContext
     await _hub.Groups.AddToGroupAsync( player.UserName, room.Id, ct );
     await _hub.Clients.Group( room.Id ).SendAsync( "RoomUpdated", new
     {
-        RoomId = room.Id,
-        room.Players,
-        Command = room.NonTransitiveCommand
+      RoomId = room.Id,
+      room.Players,
+      Command = room.NonTransitiveCommand
     }, cancellationToken: ct );
   }
 

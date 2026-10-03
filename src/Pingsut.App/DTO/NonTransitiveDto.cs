@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using Pingsut.App.Domain;
 using Pingsut.App.Features.NonTransitive;
 
@@ -9,22 +9,22 @@ namespace Pingsut.App.DTO;
 [PublicAPI]
 public sealed record NonTransitiveCreateRoomRequestDto(
     List<NonTransitiveAction> Actions,
-    List<NonTransitiveRule> Rules);
+    List<NonTransitiveRule> Rules );
 
 [PublicAPI]
 public sealed record NonTransitiveLeaveRoomRequestDto(
     string PlayerUserName,
-    string RoomId);
+    string RoomId );
 
 [PublicAPI]
 public sealed record NonTransitiveSendMoveRequestDto(
     string PlayerUserName,
     string RoomId,
-    int ActionId);
+    int ActionId );
 
 [PublicAPI]
 public sealed record NonTransitiveLockResultRequestDto(
-    Player Player);
+    Player Player );
 
 #endregion // Requests
 

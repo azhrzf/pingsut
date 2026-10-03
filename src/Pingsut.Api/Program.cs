@@ -1,7 +1,7 @@
 using Pingsut.Api;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder( args );
 
-var app = builder.ConfigureServices().ConfigurePipeline();
+WebApplication app = builder.ConfigureServices().ConfigurePipeline();
 
 app.Run();

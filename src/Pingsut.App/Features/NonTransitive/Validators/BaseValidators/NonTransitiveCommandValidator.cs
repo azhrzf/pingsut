@@ -1,4 +1,4 @@
-﻿namespace Pingsut.App.Features.NonTransitive.Validators.BaseValidators;
+namespace Pingsut.App.Features.NonTransitive.Validators.BaseValidators;
 
 public static class NonTransitiveCommandValidator
 {

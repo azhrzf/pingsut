@@ -44,7 +44,7 @@ public class NonTransitiveService : INonTransitiveService
     if( playerUserName is null ) throw new AuthenticationException( "Invalid player username" );
     NonTransitiveCreateRoomValidator.Validate( request );
 
-    Player player = new(playerUserName);
+    Player player = new( playerUserName );
 
     string roomId = Guid.NewGuid().ToString();
 
@@ -59,7 +59,7 @@ public class NonTransitiveService : INonTransitiveService
       CancellationToken ct = default )
   {
     playerUserName ??= Guid.NewGuid().ToString();
-    Player player = new(playerUserName);
+    Player player = new( playerUserName );
 
     NonTransitiveRoom room = _roomStore.GetRoomByRoomId( roomId );
 
@@ -124,9 +124,9 @@ public class NonTransitiveService : INonTransitiveService
     NonTransitiveAction translatedOpponentAction =
         command.Actions.Single( action => action.Id == opponentAction.ActionId );
 
-    NonTransitivePlayerResult playerResult = new(playerAction.Player, matchPlayerResult, translatedAction);
+    NonTransitivePlayerResult playerResult = new( playerAction.Player, matchPlayerResult, translatedAction );
     NonTransitivePlayerResult opponentResult =
-        new(opponentAction.Player, matchOpponentResult, translatedOpponentAction);
+        new( opponentAction.Player, matchOpponentResult, translatedOpponentAction );
 
     return new NonTransitiveResult( [playerResult, opponentResult] );
   }

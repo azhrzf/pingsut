@@ -1,27 +1,28 @@
 namespace Pingsut.Api.Handlers;
 
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
 public sealed class GlobalExceptionHandler(
     IProblemDetailsService problemDetailsService,
-    ILogger<GlobalExceptionHandler> logger)
+    ILogger<GlobalExceptionHandler> logger )
     : IExceptionHandler
 {
-    public async ValueTask<bool> TryHandleAsync(
-        HttpContext httpContext,
-        Exception exception,
-        CancellationToken cancellationToken)
+  public async ValueTask<bool> TryHandleAsync(
+      HttpContext httpContext,
+      Exception exception,
+      CancellationToken cancellationToken )
+  {
+    ProblemDetails problemDetails = ProblemDetailsMapper.Map( exception );
+    httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
+
+    logger.LogError( exception, "Unhandled exception occurred" );
+
+    return await problemDetailsService.TryWriteAsync( new ProblemDetailsContext
     {
-        var problemDetails = ProblemDetailsMapper.Map(exception);
-        httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
-
-        logger.LogError(exception, "Unhandled exception occurred");
-
-        return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
-        {
-            HttpContext = httpContext,
-            Exception = exception,
-            ProblemDetails = problemDetails
-        });
-    }
+      HttpContext = httpContext,
+      Exception = exception,
+      ProblemDetails = problemDetails
+    } );
+  }
 }

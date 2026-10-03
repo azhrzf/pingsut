@@ -11,37 +11,37 @@ internal static class ProblemDetailsMapper
   {
     Map<ValidationException>( exception => new ProblemDetails
     {
-        Status = StatusCodes.Status400BadRequest,
-        Title = "Bad Request",
-        Detail = exception.Message
+      Status = StatusCodes.Status400BadRequest,
+      Title = "Bad Request",
+      Detail = exception.Message
     } );
 
     Map<AuthenticationException>( exception => new ProblemDetails
     {
-        Status = StatusCodes.Status401Unauthorized,
-        Title = "Unauthenticated",
-        Detail = exception.Message
+      Status = StatusCodes.Status401Unauthorized,
+      Title = "Unauthenticated",
+      Detail = exception.Message
     } );
 
     Map<UnauthorizedAccessException>( exception => new ProblemDetails
     {
-        Status = StatusCodes.Status403Forbidden,
-        Title = "Unauthorized",
-        Detail = exception.Message
+      Status = StatusCodes.Status403Forbidden,
+      Title = "Unauthorized",
+      Detail = exception.Message
     } );
 
     Map<KeyNotFoundException>( exception => new ProblemDetails
     {
-        Status = StatusCodes.Status404NotFound,
-        Title = "Not Found",
-        Detail = exception.Message
+      Status = StatusCodes.Status404NotFound,
+      Title = "Not Found",
+      Detail = exception.Message
     } );
 
     Map<NonTransitiveException>( exception => new ProblemDetails
     {
-        Status = StatusCodes.Status400BadRequest,
-        Title = "Validation Error",
-        Detail = exception.Message
+      Status = StatusCodes.Status400BadRequest,
+      Title = "Validation Error",
+      Detail = exception.Message
     } );
   }
 
@@ -54,9 +54,9 @@ internal static class ProblemDetailsMapper
 
     return new ProblemDetails
     {
-        Status = StatusCodes.Status500InternalServerError,
-        Title = "Internal Server Error",
-        Detail = "An unexpected error occurred."
+      Status = StatusCodes.Status500InternalServerError,
+      Title = "Internal Server Error",
+      Detail = "An unexpected error occurred."
     };
   }
 
@@ -64,7 +64,7 @@ internal static class ProblemDetailsMapper
 
   private static void Map<TException>( Func<TException, ProblemDetails> mapping ) where TException : Exception
   {
-    ExceptionMapper mapper = new(typeof( TException ), exception => mapping( ( TException )exception ));
+    ExceptionMapper mapper = new( typeof( TException ), exception => mapping( ( TException )exception ) );
     Mappers.Add( mapper );
   }
 

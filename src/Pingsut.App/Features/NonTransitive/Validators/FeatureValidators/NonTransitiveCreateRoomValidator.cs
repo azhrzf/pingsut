@@ -1,4 +1,4 @@
-﻿using Pingsut.App.DTO;
+using Pingsut.App.DTO;
 using Pingsut.App.Features.NonTransitive.Validators.BaseValidators;
 
 namespace Pingsut.App.Features.NonTransitive.Validators.FeatureValidators;
