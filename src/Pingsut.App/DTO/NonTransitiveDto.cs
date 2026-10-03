@@ -4,16 +4,12 @@ using Pingsut.App.Features.NonTransitive;
 
 namespace Pingsut.App.DTO;
 
-[PublicAPI]
-public sealed record NonTransitiveCreateRoomRequestDto(
-    Player PlayerCreator,
-    List<NonTransitiveAction> Actions,
-    List<NonTransitiveRule> Rules);
+#region Requests
 
 [PublicAPI]
-public sealed record NonTransitiveJoinRoomRequestDto(
-    Player Player,
-    string RoomId);
+public sealed record NonTransitiveCreateRoomRequestDto(
+    List<NonTransitiveAction> Actions,
+    List<NonTransitiveRule> Rules);
 
 [PublicAPI]
 public sealed record NonTransitiveLeaveRoomRequestDto(
@@ -29,3 +25,15 @@ public sealed record NonTransitiveSendMoveRequestDto(
 [PublicAPI]
 public sealed record NonTransitiveLockResultRequestDto(
     Player Player);
+
+#endregion // Requests
+
+#region Responses
+
+[PublicAPI]
+public sealed record NonTransitiveJoinRoomResponseDto(
+    string Id,
+    List<Player> Players
+);
+
+#endregion // Responses
